@@ -1,0 +1,73 @@
+@media (max-width: 35rem) {
+	article {
+		padding: .65em;
+	}
+	article{
+		font-size: 16px;
+	}
+	article p{
+		letter-spacing: -0.01px;
+		line-height: 1.4em;
+	}
+}
+@media (min-width: 35rem) {
+	article {
+		padding: 2.5em;
+	}
+
+}
+article{
+	z-index: 1;
+	margin: 1em 0;
+	border-radius: 5px;
+	background-color:var(--accent-800);
+	color: var(--color);
+	text-align: left;
+	max-width: 65ch;
+	font-size: 20px;
+}
+article p{
+	text-align: left;
+	letter-spacing: -0.01px;
+	line-height: 1.6em;
+	font-weight: 500;
+	padding: 0 0 1em 0;
+	margin: 0;
+	font-family: charter, Georgia, Cambria, "Times New Roman", Times, serif;
+	text-indent: 1em;
+}
+article h1{
+	text-align: center;
+	font-size: 2.4em;
+	font-family: elephant, 'Abril Fatface', serif;
+	padding: .25em 0;
+	margin: 0;
+}
+article h2{
+	margin: 0;
+	font-size: 1.6em;
+	font-family: elephant,'Abril Fatface', serif;
+	text-align: center;
+}   
+article h3{
+	margin: 0 0 1em 0;
+	font-size: 1.2em;
+	font-family: charter, Georgia, Cambria, "Times New Roman", Times, serif;
+	text-align: left;
+}   
+article h4{
+	margin: 0 0 1em 0;
+	font-size: 1.1em;
+	font-family: charter, Georgia, Cambria, "Times New Roman", Times, serif;
+	text-align: left;
+}   
+article ul{
+	text-align: left;
+	letter-spacing: -0.01px;
+	line-height: 32px;
+	font-weight: 500;
+	padding: 0 0 1em 3rem;
+	margin: 0;
+	font-family: charter, Georgia, Cambria, "Times New Roman", Times, serif;
+	text-indent: 1em;
+}
