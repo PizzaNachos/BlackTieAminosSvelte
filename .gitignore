@@ -1,0 +1,12 @@
+.DS_Store
+node_modules
+/build
+/.svelte-kit/*/**
+/.svelte-kit/ambient.d.ts
+/.svelte-kit/tsconfig.json
+/package
+.env
+.env.*
+!.env.example
+.vercel
+.output

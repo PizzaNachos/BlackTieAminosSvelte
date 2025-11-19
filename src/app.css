@@ -1,0 +1,124 @@
+/* @font-face {
+	font-family: 'elephant';
+	src: url('/fonts/elephant.TTF'); 
+} */
+body {
+
+
+	/* --main-bg-color: #ffffff;
+	--accent-color: #dfd6d1; */
+
+	/* --main-bg-color: hsl(21, 18%, 95%) ; */
+	--accent-color: hsl(0, 0%, 71%);
+
+	--accent-100: hsl(238, 0%, 10%);
+	--accent-200: hsl(238, 0%, 20%);
+	--accent-300: hsl(238, 0%, 30%);
+	--accent-400: hsl(238, 0%, 40%);
+	--accent-500: hsl(238, 0%, 50%);
+	--accent-600: hsl(238, 0%, 60%);
+	--accent-700: hsl(238, 0%, 70%);
+	--accent-750: hsl(238, 0%, 75%);
+	--accent-800: hsl(238, 0%, 80%);
+	--accent-900: hsl(238, 0%, 90%);
+	--accent-950: hsl(238, 0%, 95%);
+
+	--main-bg-color: var(--accent-900);
+
+	--text_color: rgb(0, 0, 0);
+	--white: white;
+
+	--alt-color: rgb(60, 57, 249);
+}
+body.dark{
+	/* --accent-color: hsl(21, 18%, 65%);
+
+	--accent-100: hsl(21, 18%, 90%);
+	--accent-200: hsl(21, 18%, 80%);
+	--accent-300: hsl(21, 18%, 70%);
+	--accent-400: hsl(21, 18%, 60%);
+	--accent-500: hsl(21, 18%, 50%);
+	--accent-600: hsl(21, 18%, 40%);
+	--accent-700: hsl(21, 18%, 30%);
+	--accent-800: hsl(21, 18%, 20%);
+	--accent-900: hsl(21, 18%, 10%);
+	--accent-950: hsl(21, 18%, 5%);
+
+	--main-bg-color: var(--accent-900);
+
+	--text_color: rgb(255,255,255);
+	--white: black;
+	--alt-color: hsl(0, 65%, 31%); */
+
+}
+*{
+	padding: none;
+	margin: none;
+	border: none;
+}
+body {
+	min-height: 100vh;
+	margin: 0;
+	background-color: var(--main-bg-color);
+	font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+	"Lucida Sans", Arial, sans-serif;
+	color: var(--text_color);
+}
+
+
+#svelte {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+h1,
+h2,
+p {
+	font-weight: 400;
+	color: var(--heading-color);
+}
+
+p {
+	line-height: 1.5;
+}
+
+a {
+	text-decoration: underline;
+	color: var(--text-color)
+}
+
+h1 {
+	font-size: 2rem;
+	text-align: center;
+}
+
+h2 {
+	font-size: 1rem;
+}
+
+.icon:hover{
+	transition: all .25s ease-out;
+	transform: scale(1.15);
+	cursor: pointer;
+}
+
+input,
+button {
+	font-size: inherit;
+	font-family: inherit;
+}
+
+button:focus:not(:focus-visible) {
+	outline: none;
+}
+
+@media (min-width: 720px) {
+	h1 {
+		font-size: 2.4rem;
+	}
+}
+
+/* .loading{
+	filter: blur(1px) saturate(.8);
+} */
