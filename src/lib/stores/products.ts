@@ -85,12 +85,12 @@ export let glp1_store = writable<product[]>([
         id: 2,
         published: true,
         stripe_key: "price_1RhFdnD3LzjANe5wKsHDy0LU",
-        name: "Tirzepetide - 30mg",
+        name: "Tirzepatide - 30mg",
         long_desc: [
-            `Tirzepetide is an advanced dual - agonist research peptide known for its activity at both the GIP and GLP- 1 receptors. 
-            This unique dual - pathway profile has positioned Tirzepetide as a leading compound in metabolic and endocrine research, 
+            `Tirzepatide is an advanced dual - agonist research peptide known for its activity at both the GIP and GLP- 1 receptors. 
+            This unique dual - pathway profile has positioned Tirzepatide as a leading compound in metabolic and endocrine research, 
             offering scientists a deeper look into mechanisms related to glucose regulation, energy balance, and peptide - based signaling.`,
-            `Our Tirzepetide 30mg vial is produced with exceptional purity and consistency, delivering a refined research-grade compound suitable
+            `Our Tirzepatide 30mg vial is produced with exceptional purity and consistency, delivering a refined research-grade compound suitable
              for controlled laboratory environments. Each lyophilized vial is sealed to preserve stability and ensure reliable experimental performance.`,
             `Usage Disclaimer This compound is intended solely for scientific research. 
             Not for human consumption, clinical use, or veterinary applications.`
@@ -99,8 +99,9 @@ export let glp1_store = writable<product[]>([
         unit: "vial",
         product_type: ProductType.glp1,
         product_image_url_paths: [
-            "/tirz30/tirz30-pink.png",
-            "/tirz30/tirz30x3.png"
+            "/tirz30/tirz30-single.png",
+            "/tirz30/tirz30x3.png",
+            "/tirz30/tirz30-box.jpeg",
         ],
         featured_image_url_paths: [
             "/tirz30/tirz30-pink.png",
