@@ -104,8 +104,9 @@ export let glp1_store = writable<product[]>([
             "/tirz30/tirz30-box.jpeg",
         ],
         featured_image_url_paths: [
-            "/tirz30/tirz30-pink.png",
-            "/tirz30/tirz30x3.png"
+            "/tirz30/tirz30-single.png",
+            "/tirz30/tirz30x3.png",
+            "/tirz30/tirz30-box.jpeg",
         ],
         alias: "tirz30",
         coa_path: "/toffee/nutrition/milk_1lb.jpg",
