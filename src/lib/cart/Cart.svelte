@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { cart_contents, remove_from_cart, update_quantity, cart_subtotal_cents } from '$lib/stores/cart';
+	import {
+		cart_contents,
+		remove_from_cart,
+		update_quantity,
+		cart_subtotal_cents
+	} from '$lib/stores/cart';
 	import { blur } from 'svelte/transition';
 	import type { cart_product } from '$lib/interfaces';
 	import XIcon from '$lib/icons/XIcon.svelte';
@@ -32,7 +37,11 @@
 			{#each $cart_contents as pro (pro.product.id)}
 				<div in:blur|global out:blur|global class="cart_item">
 					{#if pro.product.product_image_url_paths?.[0]}
-						<img class="thumb" src={pro.product.product_image_url_paths[0]} alt={pro.product.name} />
+						<img
+							class="thumb"
+							src={pro.product.product_image_url_paths[0]}
+							alt={pro.product.name}
+						/>
 					{:else}
 						<div class="thumb placeholder"></div>
 					{/if}
