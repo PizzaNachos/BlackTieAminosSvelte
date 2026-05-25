@@ -156,7 +156,7 @@ export async function submitUnpaid(contact: ContactDetails): Promise<{ order_id?
 	if (contact.heard_from && contact.heard_from.trim()) {
 		noteParts.push(`Who did you hear us through?: ${contact.heard_from.trim()}`);
 	}
-	if (noteParts.length > 0) payload.note = noteParts.join('\n\n');
+	if (noteParts.length > 0) payload.notes = noteParts.join('\n\n');
 
 	const raw: any = await qoro.checkoutUnpaid(payload);
 	const order_id =
