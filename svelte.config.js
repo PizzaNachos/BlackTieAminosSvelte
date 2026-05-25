@@ -1,16 +1,42 @@
-import adapter from '@sveltejs/adapter-auto';
+import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-
+// import { sveltePreprocess } from 'svelte-preprocess';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	// Consult https://svelte.dev/docs/kit/integrations
+	// Consult https://github.com/sveltejs/svelte-preprocess
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 	kit: {
-		// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
-		// If your environment is not supported, or you settled on a specific environment, switch out the adapter.
-		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
-		adapter: adapter()
+		// browser: {
+		// 	router: true
+		// },
+		adapter: adapter({
+			strict: false,
+			fallback: '200.html',
+			trailingSlash: 'always'
+		}),
+		prerender: {
+			// use relative URLs similar to an anchor tag <a href="/test/1"></a>
+			// do not include group layout folders in the path such as /(group)/test/1
+			entries: ['*'],
+			handleHttpError: 'warn',
+			crawl: true
+		},
+		inlineStyleThreshold: 5000
+		// trailingSlash: "always"
+		// Override http methods in the Todo forms
+	},
+	onwarn: (warning, handler) => {
+		// return
+		// console.log(warning.code)
+		if (
+			warning.code === 'css-unused-selector' ||
+			warning.code === 'a11y-no-static-element-interactions' ||
+			warning.code === 'a11y-click-events-have-key-events'
+		) {
+			return;
+		}
+		handler(warning);
 	}
 };
 

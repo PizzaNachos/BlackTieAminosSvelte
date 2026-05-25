@@ -44,6 +44,5 @@ export let product_types_map = new Map([
 ])
 
 export function get_my_type_object(type: ProductType) {
-    console.log("fetching type", type, product_types_map.get(type))
     return product_types_map.get(type)
 }

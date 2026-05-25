@@ -6,9 +6,10 @@
 	import { get } from 'svelte/store';
 
 	export let me: product;
-	let items;
+	$: hasVariants = (me.variants?.length ?? 0) > 0;
+	let items: product[] = [];
 	let multi = false;
-	if (me?.multi == true) {
+	if (me?.multi == true && me.items?.length) {
 		multi = true;
 		items = me.items;
 		me = me.items[0];
@@ -25,16 +26,16 @@
 	};
 
 	let image_index = 0;
-	let my_nums_reviews = get(reviews_store).filter((r) => r.toffee_key.includes(me?.alias)).length;
+	const reviews = get(reviews_store) as Array<{ toffee_key: string[]; rating: number }>;
+	let my_nums_reviews = reviews.filter((r) => r.toffee_key.includes(me?.alias)).length;
 	let my_rating = Math.ceil(
-		get(reviews_store)
-			.filter((r) => r.toffee_key.includes(me.alias))
-			.reduce((a, b) => a + b.rating, 0) / my_nums_reviews
+		reviews.filter((r) => r.toffee_key.includes(me.alias)).reduce((a, b) => a + b.rating, 0) /
+			my_nums_reviews
 	);
 
 	let stars = Array.from('0'.repeat(my_rating ?? 0));
 	let max_index = me?.featured_image_url_paths?.length - 1;
-	function toggle_image(time) {
+	function toggle_image(time: number) {
 		image_index = image_index >= max_index ? 0 : image_index + 1;
 		setTimeout(() => toggle_image(random_time()), time * 1000);
 	}
@@ -100,6 +101,9 @@
 							</select>
 						{/if}
 						<span class="price">${Math.round(me.price / 100)}</span>
+						{#if hasVariants}
+							<span class="variant_note">{me.variants?.length} options available</span>
+						{/if}
 						<!-- {#if my_nums_reviews > 0}
 							<div class="stars">
 								{#each stars as r}
@@ -116,7 +120,7 @@
 							class="add_to_cart trackable"
 							href="/products/{me.alias}"
 						>
-							View Product
+							{hasVariants ? 'View Options' : 'View Product'}
 						</a>
 					</div>
 				</div>
@@ -126,7 +130,7 @@
 </div>
 
 <style>
-	@media (max-width: 25rem) {
+	@media (max-width: 35rem) {
 		.product {
 			display: flex;
 			flex-direction: column;
@@ -148,28 +152,18 @@
 			text-align: left;
 		}
 		.big_wrapper {
-			border-bottom: 1px solid var(--accent-700);
-			border-top: 1px solid var(--accent-700);
+			/* border-bottom: 1px solid var(--accent-700); */
+			/* border-top: 1px solid var(--accent-700); */
 			padding: 1em 0;
 		}
 		.big_wrapper:nth-child(2n) > .regular_wrapper {
 			padding-left: 0.5em;
-			border-right: 1px solid rgba(0, 0, 0, 0);
+			/* border-right: 1px solid rgba(0, 0, 0, 0); */
 		}
 		.big_wrapper:nth-child(odd) > .regular_wrapper {
-			border-right: 1px solid var(--accent-700);
+			/* border-right: 1px solid var(--accent-700); */
 			padding-right: 0.5em;
 		}
-		/* .big_wrapper {
-      border-bottom: 1px solid var(--accent-500);
-      border-top: 1px solid var(--accent-500);
-
-      padding: 1em 0;
-    }
-    .big_wrapper:last-child > .regular_wrapper {
-      border-right: 1px solid rgba(0, 0, 0, 0);
-      padding-right: 0.5em;
-    } */
 		.regular_wrapper {
 			height: 100%;
 		}
@@ -222,7 +216,7 @@
 			border: 2px solid var(--accent-200);
 		}
 	}
-	@media (min-width: 25rem) {
+	@media (min-width: 35rem) {
 		.product {
 			display: flex;
 			flex-direction: column;
@@ -244,28 +238,18 @@
 			text-align: left;
 		}
 		.big_wrapper {
-			border-bottom: 1px solid var(--accent-700);
-			border-top: 1px solid var(--accent-700);
+			/* border-bottom: 1px solid var(--accent-700); */
+			/* border-top: 1px solid var(--accent-700); */
 			padding: 1em 0;
 		}
 		.big_wrapper:nth-child(2n) > .regular_wrapper {
 			padding-left: 0.5em;
-			border-right: 1px solid rgba(0, 0, 0, 0);
+			/* border-right: 1px solid rgba(0, 0, 0, 0); */
 		}
 		.big_wrapper:nth-child(odd) > .regular_wrapper {
-			border-right: 1px solid var(--accent-700);
+			/* border-right: 1px solid var(--accent-700); */
 			padding-right: 0.5em;
 		}
-		/* .big_wrapper {
-      border-bottom: 1px solid var(--accent-500);
-      border-top: 1px solid var(--accent-500);
-
-      padding: 1em 0;
-    }
-    .big_wrapper:last-child > .regular_wrapper {
-      border-right: 1px solid rgba(0, 0, 0, 0);
-      padding-right: 0.5em;
-    } */
 		.regular_wrapper {
 			height: 100%;
 		}
@@ -314,18 +298,18 @@
 			margin: 0 1em;
 		}
 		.big_wrapper {
-			border-bottom: 1px solid var(--accent-500);
-			border-top: 1px solid var(--accent-500);
+			/* border-bottom: 1px solid var(--accent-500); */
+			/* border-top: 1px solid var(--accent-500); */
 
 			padding: 2em 0;
 		}
 		.big_wrapper:last-child > .regular_wrapper {
-			border-right: 1px solid rgba(0, 0, 0, 0);
+			/* border-right: 1px solid rgba(0, 0, 0, 0); */
 			padding-right: 1em;
 		}
 		.regular_wrapper {
 			height: 100%;
-			border-right: 1px solid var(--accent-500);
+			/* border-right: 1px solid var(--accent-500); */
 			padding-right: 1em;
 			padding-left: 1em;
 		}
@@ -412,6 +396,10 @@
 	}
 	.product {
 		text-decoration: none;
+	}
+	.variant_note {
+		font-size: 0.95em;
+		opacity: 0.75;
 	}
 
 	.details {

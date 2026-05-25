@@ -1,74 +1,71 @@
 <script lang="ts">
-	// import Star from '$lib/icons/Star.svelte';
+	import { onMount } from 'svelte';
 	import SimpleProduct from '$lib/product/SimpleProduct.svelte';
-	import { all_products_store } from '$lib/stores/products';
-	import { get } from 'svelte/store';
 	import IconBanner from '$lib/banners/IconBanner.svelte';
 	import DownArrow from '$lib/icons/DownArrow.svelte';
-	import { reviews_store } from '$lib/stores/reviews';
-	// import DownChevron from '$lib/icons/DownChevron.svelte';
-	// import FilledCheck from '$lib/icons/FilledCheck.svelte';
+	import { loadStorefront, favoriteUiProducts } from '$lib/qoro/store';
 
-	let products = get(all_products_store);
-	console.log(products);
+	onMount(() => {
+		loadStorefront();
+	});
 
-	let reviews = get(reviews_store).reverse();
-	let computed_reviews = [];
-	let small_indexs = [];
-	let medium_indexs = [];
-	for (let i = 0; i < reviews.length; i++) {
-		if (reviews[i].review_text.length < 160) {
-			small_indexs.push(i);
-		}
-		if (reviews[i].review_text.length > 160 && reviews[i].review_text.length < 220) {
-			medium_indexs.push(i);
-		}
-	}
+	// let reviews = get(reviews_store).reverse() ?? [];
+	// let computed_reviews = [];
+	// let small_indexs = [];
+	// let medium_indexs = [];
+	// for (let i = 0; i < reviews.length; i++) {
+	// 	if (reviews?.at(i)?.review_text?.length < 160) {
+	// 		small_indexs.push(i);
+	// 	}
+	// 	if (reviews[i].review_text.length > 160 && reviews[i].review_text.length < 220) {
+	// 		medium_indexs.push(i);
+	// 	}
+	// }
 
-	let small_index_left = small_indexs.length - 1;
-	let medium_indexs_left = medium_indexs.length - 1;
+	// let small_index_left = small_indexs.length - 1;
+	// let medium_indexs_left = medium_indexs.length - 1;
 
-	let small_index_right = 0;
-	let medium_indexs_right = 0;
+	// let small_index_right = 0;
+	// let medium_indexs_right = 0;
 
-	for (let i = 0; i < reviews.length; i++) {
-		if (
-			small_index_right < small_index_left &&
-			reviews[i].review_text.length < 160 &&
-			small_indexs[small_index_left] &&
-			reviews[small_indexs[small_index_left - 1]]
-		) {
-			computed_reviews.push({
-				reviews: [
-					reviews[i],
-					reviews[small_indexs[small_index_left]]
-					// reviews[small_indexs[small_index_left - 1]],
-				]
-			});
-			small_index_right++;
-			small_index_left -= 2;
-		} else if (
-			medium_indexs_right < medium_indexs_left &&
-			reviews[i].review_text.length < 220 &&
-			medium_indexs[medium_indexs_left]
-		) {
-			computed_reviews.push({
-				reviews: [reviews[i], reviews[medium_indexs[medium_indexs_left]]]
-			});
-			medium_indexs_right++;
-			medium_indexs_left--;
-		} else {
-			computed_reviews.push({
-				reviews: [reviews[i]]
-			});
-		}
-	}
-	computed_reviews = computed_reviews.concat(computed_reviews).concat(computed_reviews);
+	// for (let i = 0; i < reviews.length; i++) {
+	// 	if (
+	// 		small_index_right < small_index_left &&
+	// 		reviews[i].review_text.length < 160 &&
+	// 		small_indexs[small_index_left] &&
+	// 		reviews[small_indexs[small_index_left - 1]]
+	// 	) {
+	// 		computed_reviews.push({
+	// 			reviews: [
+	// 				reviews[i],
+	// 				reviews[small_indexs[small_index_left]]
+	// 				// reviews[small_indexs[small_index_left - 1]],
+	// 			]
+	// 		});
+	// 		small_index_right++;
+	// 		small_index_left -= 2;
+	// 	} else if (
+	// 		medium_indexs_right < medium_indexs_left &&
+	// 		reviews[i].review_text.length < 220 &&
+	// 		medium_indexs[medium_indexs_left]
+	// 	) {
+	// 		computed_reviews.push({
+	// 			reviews: [reviews[i], reviews[medium_indexs[medium_indexs_left]]]
+	// 		});
+	// 		medium_indexs_right++;
+	// 		medium_indexs_left--;
+	// 	} else {
+	// 		computed_reviews.push({
+	// 			reviews: [reviews[i]]
+	// 		});
+	// 	}
+	// }
+	// computed_reviews = computed_reviews.concat(computed_reviews).concat(computed_reviews);
 
-	let first_half_reviews = reviews.slice(0, Math.floor(reviews.length / 2) + 1);
-	let second_half = reviews.slice(Math.floor(reviews.length / 2) + 1);
+	// let first_half_reviews = reviews.slice(0, Math.floor(reviews.length / 2) + 1);
+	// let second_half = reviews.slice(Math.floor(reviews.length / 2) + 1);
 
-	let paused = false;
+	// let paused = false;
 </script>
 
 <svelte:head>
@@ -87,7 +84,7 @@
 		<div class="parallax_2 parallax_element">
 			<div class="h1">Buy Better Peptides</div>
 			<div class="h2">High Quality Research Compounds</div>
-			<a href="/products" class="shop_now">Shop Now</a>
+			<a href="/products/" class="shop_now">Shop Now</a>
 		</div>
 		<div class="down_arrow parallax_element">
 			<div
@@ -103,171 +100,11 @@
 	<div class="next">
 		<div class="heading_title">Best Sellers</div>
 		<div class="best_seller">
-			{#if products[0]?.prods[0]}
-				<SimpleProduct me={products[0]?.prods[0]} featured={true} />
-			{/if}
-			{#if products[0]?.prods[1]}
-				<SimpleProduct me={products[0]?.prods[1]} featured={true} />
-			{/if}
-
-			{#if products[1]?.prods[0]}
-				<SimpleProduct me={products[1]?.prods[0]} featured={true} hide_small={true} />
-			{/if}
-
-			{#if products[2]?.prods[0]}
-				<SimpleProduct me={products[2]?.prods[0]} featured={true} hide_small={true} />
-			{/if}
+			{#each $favoriteUiProducts as prod, i (prod.id)}
+				<SimpleProduct me={prod} featured={true} hide_small={i >= 2} />
+			{/each}
 		</div>
 	</div>
-	<!-- <div class="word_divider_reviews">
-		<h1 style="margin:0; padding:10px;">Reviews</h1>
-		<div
-			class="carousel"
-			class:paused
-			on:mouseenter={(e) => (paused = true)}
-			on:mouseleave={(e) => (paused = false)}
-		>
-        <div style="display:flex;flex-direction:row; gap: 1em;">
-          {#each review_group.reviews as review}
-            <div
-              class:wide={review.review_text.length > 350}
-              class="review outliend"
-              id={`rev${review.id}`}
-            >
-              <span class="rating">
-                <span>
-                  {#each Array.from("0".repeat(review.rating)) as _}
-                    <Star height="23" width="23" />
-                  {/each}
-                </span>
-                <span>
-                  <FilledCheck />
-                  Verified Review
-                </span>
-              </span>
-              <span class="review_text">
-                {review.review_text}
-              </span>
-              <span class="review_name_products">
-                <span class="name">
-                  {review.name}
-                </span>
-
-                {#if products != undefined}
-                  <span class="review_name_products_product">
-                    {#each products
-                      .map((p) => p.prods)
-                      .flat()
-                      .filter((p) => review?.toffee_key?.includes(p.alias))
-                      .map((t) => t.name) as p_name}
-                      <span>{p_name}</span>
-                      <br />
-                    {/each}
-                  </span>
-                {/if}
-              </span>
-            </div>
-          {/each}
-        </div>
-      {/each} -->
-	<!-- <div class="review_row">
-				{#each first_half_reviews as review}
-					<div
-						class:wide={review.review_text.length > 350}
-						class:medium={review.review_text.length < 350 && review.review_text.length > 250}
-						class:small={review.review_text.length < 100}
-						class="review outliend"
-						id={`rev${review.id}`}
-					>
-						<span class="rating">
-							<span>
-								{#each Array.from('0'.repeat(review.rating)) as _}
-									<Star />
-								{/each}
-							</span>
-							<span>
-								<FilledCheck />
-								Verified Review
-							</span>
-						</span>
-						<span class="review_text">
-							{review.review_text}
-						</span>
-						<span class="review_name_products">
-							<span class="name">
-								{review.name}
-							</span>
-
-							{#if products != undefined}
-								<span class="review_name_products_product">
-									{#each products
-										.map((p) => p.prods)
-										.flat()
-										.filter((p) => review?.toffee_key?.includes(p.alias))
-										.map((t) => t.name) as p_name}
-										<span>{p_name}</span>
-										<br />
-									{/each}
-								</span>
-							{/if}
-						</span>
-					</div>
-				{/each}
-			</div>
-			<div class="review_row second">
-				{#each second_half as review}
-					<div
-						class:wide={review.review_text.length > 350}
-						class:medium={review.review_text.length < 350 && review.review_text.length > 250}
-						class:small={review.review_text.length < 100}
-						class="review outliend"
-						id={`rev${review.id}`}
-					>
-						<span class="rating">
-							<span>
-								{#each Array.from('0'.repeat(review.rating)) as _}
-									<Star />
-								{/each}
-							</span>
-							<span>
-								<FilledCheck />
-								Verified Review
-							</span>
-						</span>
-						<span class="review_text">
-							{review.review_text}
-						</span>
-						<span class="review_name_products">
-							<span class="name">
-								{review.name}
-							</span>
-
-							{#if products != undefined}
-								<span class="review_name_products_product">
-									{#each products
-										.map((p) => p.prods)
-										.flat()
-										.filter((p) => review?.toffee_key?.includes(p.alias))
-										.map((t) => t.name) as p_name}
-										<span>{p_name}</span>
-										<br />
-									{/each}
-								</span>
-							{/if}
-						</span>
-					</div>
-				{/each}
-			</div>
-		</div>
-	</div> -->
-
-	<!-- <div class="review_text">
-      "This is the <span class="emphasized">best</span> toffee I've had in
-      <span class="emphasized">years</span>. It's incredibly fresh, flavorful,
-      and the textures are amazing. I would give this as a gift in a heartbeat,
-      and I plan to freeze some for myself."
-    </div>
-    <div class="author">- Liz S. | Classic Chocolate Almond Toffee</div> -->
 	<div class="our_story parallax_container_middle">
 		<div class="paragraph">
 			<div>
@@ -280,7 +117,7 @@
 				and a commitment to scientific integrity, Black Tie Aminos brings a refined, reliable
 				standard to the world of research compounds.
 			</div>
-			<a href="/products" class="shop_now">Shop Our Products</a>
+			<a href="/products/" class="shop_now">Shop Our Products</a>
 		</div>
 		<img src="/reta10/reta10-stand.jpeg" alt="img" />
 	</div>
@@ -490,7 +327,11 @@
 		.h1 {
 			font-size: 2rem;
 			font-family:
-				Elephant, 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
+				] 'Trebuchet MS',
+				'Lucida Sans Unicode',
+				'Lucida Grande',
+				'Lucida Sans',
+				Arial,
 				sans-serif;
 		}
 		.h2 {
@@ -527,8 +368,7 @@
 		.h1 {
 			font-size: 4rem;
 			font-family:
-				Elephant, 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
-				sans-serif;
+				'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 		}
 		.h2 {
 			font-size: 2rem;
@@ -589,8 +429,7 @@
 			font-size: 3rem;
 			text-align: center;
 			font-family:
-				Elephant, 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
-				sans-serif;
+				'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 		}
 		.small_hidden {
 			display: none;
@@ -610,8 +449,7 @@
 			font-size: 3rem;
 			text-align: center;
 			font-family:
-				Elephant, 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial,
-				sans-serif;
+				'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 		}
 	}
 

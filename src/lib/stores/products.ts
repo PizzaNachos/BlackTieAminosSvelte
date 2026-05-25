@@ -302,9 +302,6 @@ export const regular_shipping: product = {
     unit: "box",
     long_desc: [""],
 };
-// if(PUBLIC_IS_TEST){
-//     regular_shipping.key = "price_1K9eGhD3LzjANe5wkk2WYVSJ"
-// }
 export const free_shipping: product = {
     id: 12,
     name: "Free Shipping",

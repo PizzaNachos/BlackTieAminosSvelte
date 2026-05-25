@@ -1,11 +1,9 @@
 <script lang="ts">
-	import CartDrawer from '$lib/cart/CartDrawer.svelte';
 	import { fly } from 'svelte/transition';
 	import { beforeNavigate } from '$app/navigation';
 	import { browser } from '$app/environment';
-	import Bear from '$lib/icons/Bear.svelte';
-	import { multi_order_object } from '$lib/stores/multi_order';
 	import Logo from '$lib/icons/Logo.svelte';
+	import { cart_count } from '$lib/stores/cart';
 
 	export let announcement;
 	export let force_visible = false;
@@ -58,6 +56,7 @@
 	<header>
 		<button
 			id="links_toggle"
+			aria-label="Open menu"
 			on:click={() => {
 				links_shown = !links_shown;
 			}}
@@ -136,6 +135,7 @@
 				<button
 					class="trackable"
 					id="links_toggle"
+					aria-label="Close menu"
 					on:click={() => {
 						links_shown = !links_shown;
 					}}
@@ -260,81 +260,27 @@
 		</div>
 
 		<div id="icons">
-			<CartDrawer />
+			<a class="cart_link trackable" id="cart_navbar" href="/order/" aria-label="View order">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="2rem"
+					height="2rem"
+					class="icon"
+					viewBox="0 0 16 16"
+				>
+					<path
+						d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
+					/>
+				</svg>
+				{#if $cart_count > 0}
+					<span class="cart_badge">{$cart_count}</span>
+				{/if}
+			</a>
 		</div>
 	</header>
 </div>
 
 <style>
-	#multi_order_navbar {
-		text-decoration: none;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		transition: all 0.3s ease;
-		/* word-break: keep-all; */
-		text-align: center;
-	}
-	#multi_order_navbar:hover {
-		transform: scale(1.1);
-	}
-	.multi_cart_icon_wrapper {
-		position: relative;
-		display: grid;
-		grid-template-columns: 1em;
-		grid-template-rows: 1em;
-	}
-	.multi_cart_icon_wrapper > .cart_icon {
-		position: absolute;
-		fill: var(--accent-200);
-	}
-
-	@media only screen and (max-width: 600px) {
-		.multi_cart_icon_wrapper > .cart_one {
-			bottom: 0.1em;
-			left: 0;
-		}
-		.multi_cart_icon_wrapper > .cart_two {
-			bottom: 0.25em;
-			left: 0.2em;
-		}
-		.multi_cart_icon_wrapper > .cart_three {
-			bottom: 0.4em;
-			left: 0.45em;
-		}
-		.multi_cart_icon_wrapper > .cart_four {
-			bottom: 0.8em;
-			left: 0.8em;
-			background-color: var(--accent-800);
-			border-radius: 100%;
-			padding: 0 4px;
-			z-index: 0;
-		}
-	}
-	@media only screen and (min-width: 600px) {
-		.multi_cart_icon_wrapper > .cart_one {
-			bottom: 0.1em;
-			left: 0;
-		}
-		.multi_cart_icon_wrapper > .cart_two {
-			bottom: 0.3em;
-			left: 0.2em;
-		}
-		.multi_cart_icon_wrapper > .cart_three {
-			bottom: 0.5em;
-			left: 0.35em;
-		}
-		.multi_cart_icon_wrapper > .cart_four {
-			bottom: 0.8em;
-			left: 0.8em;
-			background-color: var(--accent-800);
-			border-radius: 100%;
-			padding: 0 4px;
-			z-index: 0;
-		}
-	}
-
 	@media only screen and (max-width: 600px) {
 		#links_wrapper_desktop {
 			display: none;
@@ -379,9 +325,6 @@
 			align-items: flex-end;
 			gap: 0.5em;
 		}
-		#icons * {
-			/* margin: 0 .25rem 0 0; */
-		}
 		#top_logo {
 			font-size: 1.25rem;
 			max-height: 10vh;
@@ -422,9 +365,6 @@
 			padding: 0.5rem 0.5rem;
 			font-size: 1em;
 		}
-		#icons * {
-			margin: 0 1rem 0 0;
-		}
 		#icons {
 			display: flex;
 			flex-direction: row;
@@ -464,6 +404,32 @@
 
 	#user_icon {
 		font-size: 2.25rem;
+	}
+	.cart_link {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		text-decoration: none;
+		color: inherit;
+		fill: inherit;
+	}
+	.cart_badge {
+		position: absolute;
+		top: -0.4rem;
+		right: -0.6rem;
+		min-width: 1.2em;
+		height: 1.2em;
+		padding: 0 0.35em;
+		border-radius: 999px;
+		background-color: var(--accent-200);
+		color: var(--accent-900);
+		font-size: 0.75rem;
+		font-weight: 700;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
 	}
 
 	.nav {

@@ -1,7 +1,7 @@
 export interface ReviewInterface {
     id: number,
     user_name: string,
-    toffee_rating: number,
+    rating: number,
     product_id: string,
     date: string,
     review_text: string,
@@ -10,10 +10,12 @@ export interface ReviewInterface {
 
 export interface product {
     id: number,
+    checkout_product_id?: number | null,
     stripe_key: string,
     name: string,
     short_desc?: string,
     out_of_stock?: boolean,
+    is_checkoutable?: boolean,
     long_desc: string[],
     price: number,
     unit: string,
@@ -23,7 +25,18 @@ export interface product {
     featured_image_url_paths: string[],
     product_type?: ProductType,
     coa_path?: string,
-    published: boolean
+    published: boolean,
+    featured?: boolean,
+    multi?: boolean,
+    items?: product[],
+    product_role?: string | null,
+    variants?: product[],
+    default_variant_id?: number | null,
+    variant_label?: string | null,
+    variant_sort_order?: number | null,
+    is_default_variant?: boolean,
+    sku?: string | null,
+    parent_product_id?: number | null
 }
 
 export interface cart_product {

@@ -2,22 +2,8 @@
 	import '../../app.css';
 	import HeaderScroll from '$lib/banners/header/Header_scroll.svelte';
 	import Footer from '$lib/banners/footer/Footer.svelte';
-	// import { mount_socket, new_api_healthy, new_socket } from '$lib/stores/interactions';
 	import { afterNavigate } from '$app/navigation';
 	export const prerender = true;
-
-	// mount_socket();
-	// afterNavigate((url) => {
-	//   const interaction = {
-	//     t: "navigate",
-	//     d: {
-	//       from: url?.from?.url?.pathname,
-	//       to: url?.to?.url?.pathname,
-	//     },
-	//   };
-	//   console.log("emitting", interaction);
-	//   new_socket?.emit("interaction", interaction);
-	// });
 </script>
 
 <HeaderScroll announcement="Free US Shipping!" />

@@ -1,0 +1,471 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import {
+		cart_contents,
+		cart_subtotal_cents,
+		remove_from_cart,
+		update_quantity,
+		submitUnpaid,
+		loadContact,
+		saveContact,
+		empty_cart,
+		type ContactDetails
+	} from '$lib/stores/cart';
+	import { qoroSettings, loadStorefront } from '$lib/qoro/store';
+	import { lastSubmittedOrder } from '$lib/qoro/lastOrder';
+	import type { cart_product } from '$lib/interfaces';
+
+	let contact: ContactDetails = {
+		name: '',
+		email: '',
+		phone_number: '',
+		shipping_address: '',
+		note: '',
+		heard_from: ''
+	};
+	let submitting = false;
+	let submitError: string | null = null;
+
+	onMount(() => {
+		loadStorefront();
+		contact = loadContact();
+	});
+
+	function formatUsd(cents: number) {
+		return `$${(cents / 100).toFixed(2)}`;
+	}
+
+	function variantLabel(pro: cart_product): string | null {
+		return pro.product.variant_label ?? null;
+	}
+
+	function changeQty(pro: cart_product, delta: number) {
+		const next = pro.ammount + delta;
+		if (next <= 0) {
+			remove_from_cart(pro);
+		} else {
+			update_quantity(pro.product, next);
+		}
+	}
+
+	function setQty(pro: cart_product, value: number) {
+		if (!Number.isFinite(value) || value <= 0) {
+			remove_from_cart(pro);
+		} else {
+			update_quantity(pro.product, Math.floor(value));
+		}
+	}
+
+	$: settings = $qoroSettings;
+	$: orderingDisabled =
+		settings != null &&
+		(settings.ecommerce_enabled === false || settings.checkout?.unpaid_enabled === false);
+	$: minOrderCents = settings?.min_order_amount_cents ?? null;
+	$: requiredFields = settings?.checkout?.required_fields ?? {
+		name: true,
+		email: true,
+		phone: true,
+		shipping_address: true
+	};
+	$: belowMin = minOrderCents != null && $cart_subtotal_cents < minOrderCents;
+	$: missingRequired = (() => {
+		const missing: string[] = [];
+		if (requiredFields.name && !contact.name.trim()) missing.push('name');
+		if (requiredFields.email && !contact.email.trim()) missing.push('email');
+		if (requiredFields.phone && !contact.phone_number.trim()) missing.push('phone');
+		if (requiredFields.shipping_address && !contact.shipping_address.trim())
+			missing.push('shipping address');
+		return missing;
+	})();
+	$: canSubmit =
+		$cart_contents.length > 0 &&
+		!orderingDisabled &&
+		!belowMin &&
+		missingRequired.length === 0 &&
+		!submitting;
+
+	async function handleSubmit() {
+		if (!canSubmit) return;
+		submitting = true;
+		submitError = null;
+		try {
+			saveContact(contact);
+			const { order_id, raw } = await submitUnpaid(contact);
+			lastSubmittedOrder.set({
+				order_id,
+				submittedAt: Date.now(),
+				contact: { ...contact },
+				raw
+			});
+			empty_cart();
+			await goto('/order/submitted/');
+		} catch (e: any) {
+			submitError = e?.message ?? 'Submission failed. Please try again.';
+		} finally {
+			submitting = false;
+		}
+	}
+</script>
+
+<svelte:head>
+	<title>Black Tie Aminos | Submit Order</title>
+	<link rel="icon" href="/favicon.png" />
+</svelte:head>
+
+<section class="order_page">
+	<h1>Your Order</h1>
+
+	{#if $cart_contents.length === 0}
+		<div class="empty">
+			<p>Your cart is empty.</p>
+			<a class="cta" href="/products/">Browse products</a>
+		</div>
+	{:else}
+		<div class="grid">
+			<div class="items_col">
+				<h2>Items</h2>
+				<div class="items">
+					{#each $cart_contents as pro (pro.product.id)}
+						<div class="item">
+							{#if pro.product.product_image_url_paths?.[0]}
+								<img
+									class="thumb"
+									src={pro.product.product_image_url_paths[0]}
+									alt={pro.product.name}
+								/>
+							{:else}
+								<div class="thumb placeholder"></div>
+							{/if}
+							<div class="meta">
+								<div class="name">{pro.product.name}</div>
+								{#if variantLabel(pro)}
+									<div class="variant">{variantLabel(pro)}</div>
+								{/if}
+								<div class="unit_price">{formatUsd(pro.product.price)} / {pro.product.unit}</div>
+								<div class="qty">
+									<button on:click={() => changeQty(pro, -1)} aria-label="Decrease">-</button>
+									<input
+										type="number"
+										min="1"
+										value={pro.ammount}
+										on:change={(e) => setQty(pro, Number((e.target as HTMLInputElement).value))}
+									/>
+									<button on:click={() => changeQty(pro, 1)} aria-label="Increase">+</button>
+								</div>
+							</div>
+							<div class="line_end">
+								<button class="remove" on:click={() => remove_from_cart(pro)}>Remove</button>
+								<div class="line_total">{formatUsd(pro.ammount * pro.product.price)}</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+
+				<div class="subtotal">
+					<span>Subtotal</span>
+					<span>{formatUsd($cart_subtotal_cents)}</span>
+				</div>
+
+				{#if minOrderCents != null}
+					<div class="minorder" class:warn={belowMin}>
+						Minimum order: {formatUsd(minOrderCents)}
+					</div>
+				{/if}
+			</div>
+
+			<div class="form_col">
+				<h2>Contact & Shipping</h2>
+				<p class="lede">
+					No payment is collected here. We'll review your order and reach out to confirm details and
+					arrange payment.
+				</p>
+
+				<form on:submit|preventDefault={handleSubmit}>
+					<label>
+						<span>Name</span>
+						<input
+							type="text"
+							bind:value={contact.name}
+							required={requiredFields.name}
+							autocomplete="name"
+						/>
+					</label>
+					<label>
+						<span>Email</span>
+						<input
+							type="email"
+							bind:value={contact.email}
+							required={requiredFields.email}
+							autocomplete="email"
+						/>
+					</label>
+					<label>
+						<span>Phone</span>
+						<input
+							type="tel"
+							bind:value={contact.phone_number}
+							required={requiredFields.phone}
+							autocomplete="tel"
+							placeholder="+1 555 555 5555"
+						/>
+					</label>
+					<label>
+						<span>Shipping address</span>
+						<textarea
+							bind:value={contact.shipping_address}
+							required={requiredFields.shipping_address}
+							rows="3"
+							autocomplete="street-address"
+							placeholder="Street, City, State, Postal code, Country"
+						></textarea>
+					</label>
+					<label>
+						<span>Note (optional)</span>
+						<textarea bind:value={contact.note} rows="3" placeholder="Anything else we should know?"
+						></textarea>
+					</label>
+					<label>
+						<span>Who did you hear us through?</span>
+						<input
+							type="text"
+							bind:value={contact.heard_from}
+							placeholder="Name, referral, group, or community"
+						/>
+						<small>This helps us expedite your independent researcher status.</small>
+					</label>
+
+					{#if orderingDisabled}
+						<div class="banner err">Ordering is temporarily unavailable.</div>
+					{/if}
+					{#if belowMin}
+						<div class="banner warn">
+							Add {formatUsd((minOrderCents ?? 0) - $cart_subtotal_cents)} more to reach the minimum
+							order.
+						</div>
+					{/if}
+					{#if missingRequired.length > 0}
+						<div class="banner subtle">
+							Required: {missingRequired.join(', ')}
+						</div>
+					{/if}
+					{#if submitError}
+						<div class="banner err">{submitError}</div>
+					{/if}
+
+					<button class="submit" type="submit" disabled={!canSubmit}>
+						{submitting ? 'Submitting…' : 'Submit Order for Follow-up'}
+					</button>
+				</form>
+			</div>
+		</div>
+	{/if}
+</section>
+
+<style>
+	.order_page {
+		padding: 2rem 1rem 4rem;
+		max-width: 80rem;
+		margin: 0 auto;
+	}
+	h1 {
+		font-size: 2.2rem;
+		margin: 0 0 1.5rem;
+	}
+	h2 {
+		font-size: 1.4rem;
+		margin: 0 0 1rem;
+	}
+	.grid {
+		display: grid;
+		gap: 2rem;
+	}
+	@media (min-width: 56rem) {
+		.grid {
+			grid-template-columns: 1.3fr 1fr;
+			align-items: start;
+		}
+	}
+	.items {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.item {
+		display: grid;
+		grid-template-columns: 5em 1fr auto;
+		gap: 1rem;
+		background-color: var(--accent-800);
+		padding: 0.75em;
+		align-items: center;
+	}
+	.thumb {
+		width: 5em;
+		height: 5em;
+		object-fit: contain;
+		background: var(--accent-700);
+	}
+	.thumb.placeholder {
+		background: var(--accent-700);
+	}
+	.meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35em;
+	}
+	.name {
+		font-weight: 600;
+	}
+	.variant {
+		font-size: 0.85em;
+		opacity: 0.75;
+	}
+	.unit_price {
+		font-size: 0.9em;
+		opacity: 0.85;
+	}
+	.qty {
+		display: inline-flex;
+		gap: 2px;
+		background-color: var(--accent-400);
+		width: max-content;
+	}
+	.qty button {
+		background-color: var(--accent-700);
+		padding: 0 1ch;
+		cursor: pointer;
+	}
+	.qty input {
+		width: 5ch;
+		text-align: center;
+		background-color: var(--accent-800);
+		color: inherit;
+		border: none;
+	}
+	.line_end {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+		align-items: flex-end;
+	}
+	.remove {
+		background: none;
+		cursor: pointer;
+		opacity: 0.75;
+		font-size: 0.9em;
+	}
+	.remove:hover {
+		opacity: 1;
+	}
+	.line_total {
+		font-weight: 600;
+	}
+	.subtotal {
+		display: flex;
+		justify-content: space-between;
+		padding: 1rem 0.5rem;
+		border-top: 1px solid var(--accent-500);
+		margin-top: 1rem;
+		font-size: 1.2em;
+		font-weight: 600;
+	}
+	.minorder {
+		font-size: 0.9em;
+		opacity: 0.8;
+	}
+	.minorder.warn {
+		color: var(--accent-100);
+		background: rgba(170, 38, 38, 0.4);
+		padding: 0.5em 0.75em;
+		border-radius: 5px;
+		opacity: 1;
+	}
+	.lede {
+		font-size: 0.95em;
+		opacity: 0.85;
+		margin: 0 0 1rem;
+	}
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35em;
+		font-size: 0.95em;
+	}
+	label > span {
+		font-weight: 600;
+	}
+	label small {
+		opacity: 0.75;
+		line-height: 1.4;
+	}
+	input,
+	textarea {
+		font: inherit;
+		padding: 0.5em 0.75em;
+		background-color: var(--accent-800);
+		color: inherit;
+		border: 1px solid var(--accent-500);
+		border-radius: 5px;
+	}
+	input:focus,
+	textarea:focus {
+		outline: none;
+		border-color: var(--accent-200);
+	}
+	textarea {
+		resize: vertical;
+	}
+	.submit {
+		margin-top: 0.5rem;
+		padding: 0.85em 1em;
+		font-size: 1.1em;
+		font-weight: 600;
+		background-color: var(--accent-200);
+		color: var(--accent-900);
+		border: none;
+		border-radius: 6px;
+		cursor: pointer;
+	}
+	.submit:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+	.banner {
+		padding: 0.6em 0.85em;
+		border-radius: 5px;
+		font-size: 0.95em;
+	}
+	.banner.err {
+		background-color: rgba(170, 38, 38, 0.4);
+		color: var(--accent-100);
+	}
+	.banner.warn {
+		background-color: var(--accent-300);
+		color: var(--accent-900);
+	}
+	.banner.subtle {
+		background-color: var(--accent-800);
+		opacity: 0.85;
+	}
+	.empty {
+		padding: 3rem 1rem;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		align-items: center;
+	}
+	.cta {
+		background-color: var(--accent-200);
+		color: var(--accent-900);
+		padding: 0.6em 1.2em;
+		border-radius: 6px;
+		text-decoration: none;
+		font-weight: 600;
+	}
+</style>
