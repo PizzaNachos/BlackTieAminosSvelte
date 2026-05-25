@@ -1,7 +1,7 @@
 export const app_config = {
 	api_base: 'http://localhost:5506',
 	qoro: {
-		store_uuid: 'b88448ce-5d08-4430-91f0-0ed816804c29',
+		store_uuid: '9520ba63-558c-47fa-b077-224098e04379',
 		base_url: 'https://qoro.vyrelabs.com'
 	}
 };
