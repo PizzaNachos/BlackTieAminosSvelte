@@ -12,6 +12,7 @@
 		empty_cart,
 		type ContactDetails
 	} from '$lib/stores/cart';
+	import { RESEARCH_USE_AGREEMENT_TEXT } from '$lib/ruo';
 	import { qoroSettings, loadStorefront } from '$lib/qoro/store';
 	import { lastSubmittedOrder } from '$lib/qoro/lastOrder';
 	import type { cart_product } from '$lib/interfaces';
@@ -26,6 +27,7 @@
 	};
 	let submitting = false;
 	let submitError: string | null = null;
+	let researchUseAccepted = false;
 
 	onMount(() => {
 		loadStorefront();
@@ -83,6 +85,7 @@
 		!orderingDisabled &&
 		!belowMin &&
 		missingRequired.length === 0 &&
+		researchUseAccepted &&
 		!submitting;
 
 	async function handleSubmit() {
@@ -91,7 +94,10 @@
 		submitError = null;
 		try {
 			saveContact(contact);
-			const { order_id, raw } = await submitUnpaid(contact);
+			const { order_id, raw } = await submitUnpaid({
+				...contact,
+				research_use_accepted: researchUseAccepted
+			});
 			lastSubmittedOrder.set({
 				order_id,
 				submittedAt: Date.now(),
@@ -109,17 +115,17 @@
 </script>
 
 <svelte:head>
-	<title>Black Tie Aminos | Submit Order</title>
+	<title>Black Tie Aminos | Submit Research Request</title>
 	<link rel="icon" href="/favicon.png" />
 </svelte:head>
 
 <section class="order_page">
-	<h1>Your Order</h1>
+	<h1>Your Research Request</h1>
 
 	{#if $cart_contents.length === 0}
 		<div class="empty">
-			<p>Your cart is empty.</p>
-			<a class="cta" href="/products/">Browse products</a>
+			<p>Your research request is empty.</p>
+			<a class="cta" href="/products/">Browse research materials</a>
 		</div>
 	{:else}
 		<div class="grid">
@@ -177,8 +183,11 @@
 			<div class="form_col">
 				<h2>Contact & Shipping</h2>
 				<p class="lede">
-					No payment is collected here. We'll review your order and reach out to confirm details and
-					arrange payment.
+					No payment is collected here. We'll review your research request and reach out to confirm
+					details and arrange payment.
+				</p>
+				<p class="restriction_notice">
+					Requests indicating personal, human, or animal use will not be fulfilled.
 				</p>
 
 				<form on:submit|preventDefault={handleSubmit}>
@@ -234,6 +243,10 @@
 						/>
 						<small>This helps us expedite your independent researcher status.</small>
 					</label>
+					<label class="agreement">
+						<input type="checkbox" bind:checked={researchUseAccepted} required />
+						<span>{RESEARCH_USE_AGREEMENT_TEXT}</span>
+					</label>
 
 					{#if orderingDisabled}
 						<div class="banner err">Ordering is temporarily unavailable.</div>
@@ -249,12 +262,15 @@
 							Required: {missingRequired.join(', ')}
 						</div>
 					{/if}
+					{#if !researchUseAccepted}
+						<div class="banner subtle">Required: research use agreement</div>
+					{/if}
 					{#if submitError}
 						<div class="banner err">{submitError}</div>
 					{/if}
 
 					<button class="submit" type="submit" disabled={!canSubmit}>
-						{submitting ? 'Submitting…' : 'Submit Order for Follow-up'}
+						{submitting ? 'Submitting...' : 'Submit Research Request for Review'}
 					</button>
 				</form>
 			</div>
@@ -385,6 +401,12 @@
 		opacity: 0.85;
 		margin: 0 0 1rem;
 	}
+	.restriction_notice {
+		padding: 0.75rem 0.9rem;
+		background-color: var(--accent-800);
+		border-left: 4px solid var(--accent-300);
+		line-height: 1.4;
+	}
 	form {
 		display: flex;
 		flex-direction: column;
@@ -402,6 +424,23 @@
 	label small {
 		opacity: 0.75;
 		line-height: 1.4;
+	}
+	.agreement {
+		flex-direction: row;
+		align-items: flex-start;
+		gap: 0.6rem;
+		line-height: 1.4;
+	}
+	.agreement input {
+		flex: 0 0 auto;
+		width: 1.1rem;
+		height: 1.1rem;
+		margin-top: 0.15em;
+		padding: 0;
+		accent-color: var(--accent-200);
+	}
+	.agreement > span {
+		font-weight: 400;
 	}
 	input,
 	textarea {

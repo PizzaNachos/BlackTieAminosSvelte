@@ -69,5 +69,5 @@ export interface QoroUnpaidPayload {
 	email: string;
 	phone_number: string;
 	shipping_address: string;
-	note?: string;
+	notes?: string;
 }

@@ -83,7 +83,7 @@
 					data-sveltekit-preload-code="eager"
 					class="link trackable"
 					id="products_navbar"
-					href="/products/">Products</a
+					href="/products/">Research Catalog</a
 				>
 				<!-- <a data-sveltekit-preload-code="eager" class="link trackable" id="FAQ_navbar" href="/FAQ"
 					>FAQ</a
@@ -166,7 +166,7 @@
 						on:click={() => (links_shown = false)}
 						class="link trackable"
 						id="products_navbar"
-						href="/products/">Products</a
+						href="/products/">Research Catalog</a
 					>
 					<!-- <a
 						data-sveltekit-preload-code="eager"
@@ -254,13 +254,18 @@
 
 		<div id="top_logo_wrapper">
 			<a href="/" class="trackable" id="top_logo">
-				<Logo />
+				<Logo height="var(--top-logo-size)" />
 				Black Tie Aminos
 			</a>
 		</div>
 
 		<div id="icons">
-			<a class="cart_link trackable" id="cart_navbar" href="/order/" aria-label="View order">
+			<a
+				class="cart_link trackable"
+				id="cart_navbar"
+				href="/order/"
+				aria-label="View research request"
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="2rem"
@@ -326,6 +331,7 @@
 			gap: 0.5em;
 		}
 		#top_logo {
+			--top-logo-size: 2.25rem;
 			font-size: 1.25rem;
 			max-height: 10vh;
 			/* max-width: 33vw; */
@@ -373,6 +379,7 @@
 			align-items: flex-end;
 		}
 		#top_logo {
+			--top-logo-size: 2.75rem;
 			font-size: 1.5rem;
 			max-height: 10vh;
 		}

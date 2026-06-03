@@ -28,10 +28,10 @@
 </script>
 
 <div class="cart_page">
-	<div style="font-size:x-large; padding-bottom: 1rem">Cart:</div>
+	<div style="font-size:x-large; padding-bottom: 1rem">Research request:</div>
 
 	{#if $cart_contents.length === 0}
-		<div>Your cart is empty.</div>
+		<div>Your research request is empty.</div>
 	{:else}
 		<div class="cart_items">
 			{#each $cart_contents as pro (pro.product.id)}
@@ -71,8 +71,8 @@
 			<span>{formatUsd($cart_subtotal_cents)}</span>
 		</div>
 
-		<a class="submit_link" href="/order/">Review & Submit Order</a>
-		<div class="note">No payment is collected here — we'll follow up to confirm details.</div>
+		<a class="submit_link" href="/order/">Review Research Request</a>
+		<div class="note">No payment is collected here. We'll follow up to confirm details.</div>
 	{/if}
 </div>
 

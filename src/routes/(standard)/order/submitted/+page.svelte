@@ -3,22 +3,22 @@
 </script>
 
 <svelte:head>
-	<title>Black Tie Aminos | Order Received</title>
+	<title>Black Tie Aminos | Research Request Received</title>
 	<link rel="icon" href="/favicon.png" />
 </svelte:head>
 
 <section class="page">
 	<div class="card">
-		<h1>Thanks — we got it.</h1>
+		<h1>Research request received</h1>
 
 		{#if $lastSubmittedOrder?.order_id}
 			<p class="ref">
-				Order reference: <code>{$lastSubmittedOrder.order_id}</code>
+				Request reference: <code>{$lastSubmittedOrder.order_id}</code>
 			</p>
 		{/if}
 
 		<p>
-			We'll review your order request and reach out within 1–2 business days at
+			We'll review your research request and reach out within 1-2 business days at
 			{#if $lastSubmittedOrder?.contact?.email}
 				<strong>{$lastSubmittedOrder.contact.email}</strong>
 			{:else}

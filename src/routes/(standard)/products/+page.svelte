@@ -17,10 +17,10 @@
 </script>
 
 <svelte:head>
-	<title>Black Tie Aminos | Shop All Products</title>
+	<title>Black Tie Aminos | Research Catalog</title>
 	<link rel="icon" href="/favicon.png" />
-	<meta name="description" content="High Quality Research Compounds" />
-	<meta name="keywords" content="peptides, retatrutide, tirzepetide" />
+	<meta name="description" content="Laboratory research materials for lawful research use only." />
+	<meta name="keywords" content="laboratory research materials, research compounds" />
 </svelte:head>
 
 <section>

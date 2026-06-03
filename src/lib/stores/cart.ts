@@ -3,6 +3,7 @@ import { derived, get, writable } from 'svelte/store';
 import type { cart_product, product } from '$lib/interfaces';
 import { qoro } from '$lib/qoro/client';
 import type { QoroUnpaidPayload } from '$lib/qoro/types';
+import { researchUseAgreementNote } from '$lib/ruo';
 
 const STORAGE_KEY = 'bta_cart_v2';
 const CONTACT_KEY = 'bta_contact_v1';
@@ -98,6 +99,7 @@ export interface ContactDetails {
 	shipping_address: string;
 	note?: string;
 	heard_from?: string;
+	research_use_accepted?: boolean;
 }
 
 export function loadContact(): ContactDetails {
@@ -130,22 +132,31 @@ export function loadContact(): ContactDetails {
 export function saveContact(c: ContactDetails) {
 	if (!browser) return;
 	try {
-		window.localStorage.setItem(CONTACT_KEY, JSON.stringify(c));
+		const { research_use_accepted, ...storedContact } = c;
+		window.localStorage.setItem(CONTACT_KEY, JSON.stringify(storedContact));
 	} catch {
 		// ignore
 	}
 }
 
-export async function submitUnpaid(contact: ContactDetails): Promise<{ order_id?: string | number; raw: unknown }> {
+export async function submitUnpaid(
+	contact: ContactDetails
+): Promise<{ order_id?: string | number; raw: unknown }> {
 	const items = get(cart_contents);
-	if (items.length === 0) throw new Error('Cart is empty.');
+	if (items.length === 0) throw new Error('Research request is empty.');
 	const nonCheckoutable = items.find((cp) => cp.product.is_checkoutable === false);
 	if (nonCheckoutable) {
-		throw new Error(`${nonCheckoutable.product.name} is not available for checkout.`);
+		throw new Error(`${nonCheckoutable.product.name} is not available for research requests.`);
+	}
+	if (contact.research_use_accepted !== true) {
+		throw new Error('Please accept the research use agreement before submitting your request.');
 	}
 
 	const payload: QoroUnpaidPayload = {
-		products: items.map((cp) => ({ product_id: checkoutProductId(cp.product), quantity: cp.ammount })),
+		products: items.map((cp) => ({
+			product_id: checkoutProductId(cp.product),
+			quantity: cp.ammount
+		})),
 		name: contact.name.trim(),
 		email: contact.email.trim(),
 		phone_number: contact.phone_number.trim(),
@@ -156,10 +167,10 @@ export async function submitUnpaid(contact: ContactDetails): Promise<{ order_id?
 	if (contact.heard_from && contact.heard_from.trim()) {
 		noteParts.push(`Who did you hear us through?: ${contact.heard_from.trim()}`);
 	}
+	noteParts.push(researchUseAgreementNote());
 	if (noteParts.length > 0) payload.notes = noteParts.join('\n\n');
 
 	const raw: any = await qoro.checkoutUnpaid(payload);
-	const order_id =
-		raw?.order_id ?? raw?.id ?? raw?.order?.id ?? raw?.unpaid_order?.id ?? undefined;
+	const order_id = raw?.order_id ?? raw?.id ?? raw?.order?.id ?? raw?.unpaid_order?.id ?? undefined;
 	return { order_id, raw };
 }

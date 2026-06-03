@@ -11,6 +11,7 @@
 		qoroError
 	} from '$lib/qoro/store';
 	import { product_types_map } from '$lib/stores/product_types';
+	import { RESEARCH_USE_RESTRICTIONS_TEXT } from '$lib/ruo';
 
 	export let data: { slug: string };
 
@@ -169,6 +170,7 @@
 							{/each}
 						{/if}
 					</div>
+					<div class="restrictions">{RESEARCH_USE_RESTRICTIONS_TEXT}</div>
 
 					{#if activeProduct?.out_of_stock}
 						<div class="oos">Out of stock</div>
@@ -188,7 +190,7 @@
 							</div>
 						</div>
 						<button class="add_to_cart" on:click={handleAdd} disabled={!canAdd}>
-							{added ? 'Added!' : 'Add to Order'}
+							{added ? 'Added!' : 'Add to Research Request'}
 						</button>
 					{/if}
 				</div>
@@ -250,6 +252,14 @@
 		padding-top: 1em;
 		border-top: 1px solid var(--accent-500);
 		width: 100%;
+	}
+	.restrictions {
+		width: 100%;
+		padding: 0.85rem 1rem;
+		background-color: var(--accent-800);
+		border-left: 4px solid var(--accent-300);
+		line-height: 1.45;
+		box-sizing: border-box;
 	}
 	.product_details > .price_rating {
 		width: 100%;

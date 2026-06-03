@@ -1,5 +1,10 @@
+<script lang="ts">
+	import { RESEARCH_USE_RESTRICTIONS_TEXT } from '$lib/ruo';
+</script>
+
 <footer>
-	<div>Copyright 2025 Black Tie Aminos LLC</div>
+	<p class="ruo_disclaimer">{RESEARCH_USE_RESTRICTIONS_TEXT}</p>
+	<div>Copyright 2026 Black Tie Aminos LLC</div>
 	<div>
 		<a href="mailto:contact@blacktieaminos.com">contact@blacktieaminos.com</a>
 	</div>
@@ -46,8 +51,16 @@
 		padding: 5%;
 		min-height: 20vh;
 		display: flex;
+		flex-direction: column;
+		gap: 1rem;
 		justify-content: space-evenly;
 		font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial;
+	}
+	.ruo_disclaimer {
+		max-width: 80ch;
+		margin: 0;
+		line-height: 1.45;
+		font-weight: 700;
 	}
 
 	.socials a {
@@ -56,13 +69,12 @@
 	}
 	@media (max-width: 50rem) {
 		footer {
-			flex-direction: column;
 			gap: 2rem;
 		}
 	}
 	@media (min-width: 50rem) {
 		footer {
-			flex-direction: row;
+			align-items: flex-start;
 		}
 	}
 </style>

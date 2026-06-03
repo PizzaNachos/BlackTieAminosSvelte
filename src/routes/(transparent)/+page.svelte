@@ -72,8 +72,11 @@
 	<title>Black Tie Aminos</title>
 	<link rel="icon" href="/logo.png" />
 
-	<meta name="description" content="High quality Research compounds, peptides, and chemicals." />
-	<meta name="keywords" content="peptides, tirzepetide, retatrutide" />
+	<meta
+		name="description"
+		content="Laboratory research materials supplied exclusively for lawful research use."
+	/>
+	<meta name="keywords" content="laboratory research materials, research compounds" />
 </svelte:head>
 
 <section>
@@ -82,9 +85,9 @@
 			<img class="" alt="" />
 		</div>
 		<div class="parallax_2 parallax_element">
-			<div class="h1">Buy Better Peptides</div>
-			<div class="h2">High Quality Research Compounds</div>
-			<a href="/products/" class="shop_now">Shop Now</a>
+			<div class="h1">Research Peptide Catalog</div>
+			<div class="h2">Laboratory Research Materials</div>
+			<a href="/products/" class="shop_now">View Research Catalog</a>
 		</div>
 		<div class="down_arrow parallax_element">
 			<div
@@ -98,7 +101,7 @@
 	</div>
 
 	<div class="next">
-		<div class="heading_title">Best Sellers</div>
+		<div class="heading_title">Featured Research Materials</div>
 		<div class="best_seller">
 			{#each $favoriteUiProducts as prod, i (prod.id)}
 				<SimpleProduct me={prod} featured={true} hide_small={i >= 2} />
@@ -108,16 +111,12 @@
 	<div class="our_story parallax_container_middle">
 		<div class="paragraph">
 			<div>
-				Black Tie Aminos is a premium research-focused brand dedicated to providing high-purity
-				amino-based compounds for scientific and laboratory use. Built on precision, consistency,
-				and transparency, Black Tie Aminos delivers compounds that meet the demands of modern
-				research environments—whether the goal is exploring metabolic pathways, studying receptor
-				behavior, or advancing biochemical innovation. Every product is professionally labeled and
-				intended strictly for controlled research applications. With an elevated, clean aesthetic
-				and a commitment to scientific integrity, Black Tie Aminos brings a refined, reliable
-				standard to the world of research compounds.
+				Black Tie Aminos supplies laboratory research materials for controlled, lawful research
+				applications. Each catalog listing identifies the supplied material and available format.
+				Products are not offered for personal use, human or animal consumption, administration,
+				injection, diagnostic use, therapeutic use, clinical use, or veterinary use.
 			</div>
-			<a href="/products/" class="shop_now">Shop Our Products</a>
+			<a href="/products/" class="shop_now">Explore Research Catalog</a>
 		</div>
 		<img src="/reta10/reta10-stand.jpeg" alt="img" />
 	</div>
@@ -131,12 +130,9 @@
 			<h1>What are "Research Compounds"?</h1>
 			<h3>What is a peptide?</h3>
 			<p>
-				A peptide is a short chain of amino acids—the same building blocks that make up proteins.
-				While proteins are long, complex structures, peptides are smaller and often have highly
-				targeted biological roles. In research settings, peptides are used to explore cellular
-				communication, metabolic pathways, receptor activity, and potential therapeutic mechanisms.
-				Our peptides are high-purity research materials designed for controlled lab environments,
-				allowing scientists to investigate their properties safely and with precision.
+				A peptide is a chain of amino acids supplied as a laboratory research material. Catalog
+				materials are intended exclusively for controlled, lawful laboratory research. They are not
+				for personal use or use in or on humans or animals.
 			</p>
 			<!-- <a href="/blog/post/what_is_toffee" class="shop_now">Read More</a> -->
 		</article>
@@ -154,6 +150,7 @@
 		grid-template-areas: 'stack';
 		height: 100vh;
 		color: var(--accent-900);
+		overflow: hidden;
 	}
 	.parallax_element {
 		grid-area: stack;
@@ -327,12 +324,7 @@
 		.h1 {
 			font-size: 2rem;
 			font-family:
-				] 'Trebuchet MS',
-				'Lucida Sans Unicode',
-				'Lucida Grande',
-				'Lucida Sans',
-				Arial,
-				sans-serif;
+				'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 		}
 		.h2 {
 			font-size: 1.3rem;
