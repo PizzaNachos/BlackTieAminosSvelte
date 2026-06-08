@@ -97,9 +97,31 @@ export interface ContactDetails {
 	email: string;
 	phone_number: string;
 	shipping_address: string;
+	shipping_address_line1: string;
+	shipping_address_line2: string;
+	shipping_city: string;
+	shipping_state: string;
+	shipping_zipcode: string;
 	note?: string;
 	heard_from?: string;
 	research_use_accepted?: boolean;
+}
+
+export function formatShippingAddress(contact: ContactDetails): string {
+	const cityStateZip = [
+		contact.shipping_city.trim(),
+		contact.shipping_state.trim().toUpperCase(),
+		contact.shipping_zipcode.trim()
+	]
+		.filter(Boolean)
+		.join(' ');
+	return [
+		contact.shipping_address_line1.trim(),
+		contact.shipping_address_line2.trim(),
+		cityStateZip
+	]
+		.filter(Boolean)
+		.join('\n');
 }
 
 export function loadContact(): ContactDetails {
@@ -108,6 +130,11 @@ export function loadContact(): ContactDetails {
 		email: '',
 		phone_number: '',
 		shipping_address: '',
+		shipping_address_line1: '',
+		shipping_address_line2: '',
+		shipping_city: '',
+		shipping_state: '',
+		shipping_zipcode: '',
 		note: '',
 		heard_from: ''
 	};
@@ -116,13 +143,22 @@ export function loadContact(): ContactDetails {
 		const raw = window.localStorage.getItem(CONTACT_KEY);
 		if (!raw) return empty;
 		const parsed = JSON.parse(raw);
-		return {
+		const contact = {
+			...empty,
 			name: parsed.name ?? '',
 			email: parsed.email ?? '',
 			phone_number: parsed.phone_number ?? '',
-			shipping_address: parsed.shipping_address ?? '',
+			shipping_address_line1: parsed.shipping_address_line1 ?? parsed.shipping_address ?? '',
+			shipping_address_line2: parsed.shipping_address_line2 ?? '',
+			shipping_city: parsed.shipping_city ?? '',
+			shipping_state: parsed.shipping_state ?? '',
+			shipping_zipcode: parsed.shipping_zipcode ?? '',
 			note: parsed.note ?? '',
 			heard_from: parsed.heard_from ?? ''
+		};
+		return {
+			...contact,
+			shipping_address: formatShippingAddress(contact)
 		};
 	} catch {
 		return empty;
@@ -133,7 +169,13 @@ export function saveContact(c: ContactDetails) {
 	if (!browser) return;
 	try {
 		const { research_use_accepted, ...storedContact } = c;
-		window.localStorage.setItem(CONTACT_KEY, JSON.stringify(storedContact));
+		window.localStorage.setItem(
+			CONTACT_KEY,
+			JSON.stringify({
+				...storedContact,
+				shipping_address: formatShippingAddress(c)
+			})
+		);
 	} catch {
 		// ignore
 	}
@@ -160,7 +202,7 @@ export async function submitUnpaid(
 		name: contact.name.trim(),
 		email: contact.email.trim(),
 		phone_number: contact.phone_number.trim(),
-		shipping_address: contact.shipping_address.trim()
+		shipping_address: formatShippingAddress(contact)
 	};
 	const noteParts = [];
 	if (contact.note && contact.note.trim()) noteParts.push(contact.note.trim());

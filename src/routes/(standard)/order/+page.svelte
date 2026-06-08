@@ -10,6 +10,7 @@
 		loadContact,
 		saveContact,
 		empty_cart,
+		formatShippingAddress,
 		type ContactDetails
 	} from '$lib/stores/cart';
 	import { RESEARCH_USE_AGREEMENT_TEXT } from '$lib/ruo';
@@ -22,12 +23,70 @@
 		email: '',
 		phone_number: '',
 		shipping_address: '',
+		shipping_address_line1: '',
+		shipping_address_line2: '',
+		shipping_city: '',
+		shipping_state: '',
+		shipping_zipcode: '',
 		note: '',
 		heard_from: ''
 	};
 	let submitting = false;
 	let submitError: string | null = null;
 	let researchUseAccepted = false;
+	const zipCodePattern = /^[0-9]{5}(-[0-9]{4})?$/;
+	const stateOptions = [
+		['AL', 'Alabama'],
+		['AK', 'Alaska'],
+		['AZ', 'Arizona'],
+		['AR', 'Arkansas'],
+		['CA', 'California'],
+		['CO', 'Colorado'],
+		['CT', 'Connecticut'],
+		['DE', 'Delaware'],
+		['FL', 'Florida'],
+		['GA', 'Georgia'],
+		['HI', 'Hawaii'],
+		['ID', 'Idaho'],
+		['IL', 'Illinois'],
+		['IN', 'Indiana'],
+		['IA', 'Iowa'],
+		['KS', 'Kansas'],
+		['KY', 'Kentucky'],
+		['LA', 'Louisiana'],
+		['ME', 'Maine'],
+		['MD', 'Maryland'],
+		['MA', 'Massachusetts'],
+		['MI', 'Michigan'],
+		['MN', 'Minnesota'],
+		['MS', 'Mississippi'],
+		['MO', 'Missouri'],
+		['MT', 'Montana'],
+		['NE', 'Nebraska'],
+		['NV', 'Nevada'],
+		['NH', 'New Hampshire'],
+		['NJ', 'New Jersey'],
+		['NM', 'New Mexico'],
+		['NY', 'New York'],
+		['NC', 'North Carolina'],
+		['ND', 'North Dakota'],
+		['OH', 'Ohio'],
+		['OK', 'Oklahoma'],
+		['OR', 'Oregon'],
+		['PA', 'Pennsylvania'],
+		['RI', 'Rhode Island'],
+		['SC', 'South Carolina'],
+		['SD', 'South Dakota'],
+		['TN', 'Tennessee'],
+		['TX', 'Texas'],
+		['UT', 'Utah'],
+		['VT', 'Vermont'],
+		['VA', 'Virginia'],
+		['WA', 'Washington'],
+		['WV', 'West Virginia'],
+		['WI', 'Wisconsin'],
+		['WY', 'Wyoming']
+	] as const;
 
 	onMount(() => {
 		loadStorefront();
@@ -76,8 +135,16 @@
 		if (requiredFields.name && !contact.name.trim()) missing.push('name');
 		if (requiredFields.email && !contact.email.trim()) missing.push('email');
 		if (requiredFields.phone && !contact.phone_number.trim()) missing.push('phone');
-		if (requiredFields.shipping_address && !contact.shipping_address.trim())
-			missing.push('shipping address');
+		if (requiredFields.shipping_address) {
+			if (!contact.shipping_address_line1.trim()) missing.push('address line 1');
+			if (!contact.shipping_city.trim()) missing.push('city');
+			if (!contact.shipping_state.trim()) missing.push('state');
+			if (!contact.shipping_zipcode.trim()) {
+				missing.push('ZIP code');
+			} else if (!zipCodePattern.test(contact.shipping_zipcode.trim())) {
+				missing.push('valid ZIP code');
+			}
+		}
 		return missing;
 	})();
 	$: canSubmit =
@@ -93,15 +160,19 @@
 		submitting = true;
 		submitError = null;
 		try {
-			saveContact(contact);
-			const { order_id, raw } = await submitUnpaid({
+			const normalizedContact = {
 				...contact,
+				shipping_address: formatShippingAddress(contact)
+			};
+			saveContact(normalizedContact);
+			const { order_id, raw } = await submitUnpaid({
+				...normalizedContact,
 				research_use_accepted: researchUseAccepted
 			});
 			lastSubmittedOrder.set({
 				order_id,
 				submittedAt: Date.now(),
-				contact: { ...contact },
+				contact: { ...normalizedContact },
 				raw
 			});
 			empty_cart();
@@ -219,16 +290,64 @@
 							placeholder="+1 555 555 5555"
 						/>
 					</label>
-					<label>
-						<span>Shipping address</span>
-						<textarea
-							bind:value={contact.shipping_address}
-							required={requiredFields.shipping_address}
-							rows="3"
-							autocomplete="street-address"
-							placeholder="Street, City, State, Postal code, Country"
-						></textarea>
-					</label>
+					<fieldset class="address_fields">
+						<legend>Shipping address</legend>
+						<label>
+							<span>Line 1</span>
+							<input
+								type="text"
+								bind:value={contact.shipping_address_line1}
+								required={requiredFields.shipping_address}
+								autocomplete="address-line1"
+								placeholder="Street address"
+							/>
+						</label>
+						<label>
+							<span>Line 2 (optional)</span>
+							<input
+								type="text"
+								bind:value={contact.shipping_address_line2}
+								autocomplete="address-line2"
+								placeholder="Apartment, suite, unit, building, floor"
+							/>
+						</label>
+						<div class="address_row">
+							<label>
+								<span>City</span>
+								<input
+									type="text"
+									bind:value={contact.shipping_city}
+									required={requiredFields.shipping_address}
+									autocomplete="address-level2"
+								/>
+							</label>
+							<label>
+								<span>State</span>
+								<select
+									bind:value={contact.shipping_state}
+									required={requiredFields.shipping_address}
+									autocomplete="address-level1"
+								>
+									<option value="" disabled>Select</option>
+									{#each stateOptions as [abbreviation, name]}
+										<option value={abbreviation}>{abbreviation} - {name}</option>
+									{/each}
+								</select>
+							</label>
+							<label>
+								<span>ZIP code</span>
+								<input
+									type="text"
+									bind:value={contact.shipping_zipcode}
+									required={requiredFields.shipping_address}
+									autocomplete="postal-code"
+									inputmode="numeric"
+									maxlength="10"
+									title="Use a 5-digit ZIP code or ZIP+4"
+								/>
+							</label>
+						</div>
+					</fieldset>
 					<label>
 						<span>Note (optional)</span>
 						<textarea bind:value={contact.note} rows="3" placeholder="Anything else we should know?"
@@ -425,6 +544,28 @@
 		opacity: 0.75;
 		line-height: 1.4;
 	}
+	.address_fields {
+		border: 0;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+	.address_fields legend {
+		padding: 0;
+		margin-bottom: 0.35em;
+		font-weight: 600;
+	}
+	.address_row {
+		display: grid;
+		gap: 0.75rem;
+	}
+	@media (min-width: 34rem) {
+		.address_row {
+			grid-template-columns: 1fr 6rem 11rem;
+		}
+	}
 	.agreement {
 		flex-direction: row;
 		align-items: flex-start;
@@ -443,6 +584,7 @@
 		font-weight: 400;
 	}
 	input,
+	select,
 	textarea {
 		font: inherit;
 		padding: 0.5em 0.75em;
@@ -452,6 +594,7 @@
 		border-radius: 5px;
 	}
 	input:focus,
+	select:focus,
 	textarea:focus {
 		outline: none;
 		border-color: var(--accent-200);
